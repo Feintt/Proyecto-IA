@@ -3,3 +3,4 @@ py2neo==2021.2.4
 streamlit
 networkx
 pyvis
+matplotlib

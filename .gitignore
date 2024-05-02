@@ -33,3 +33,4 @@ neo4j
 __pycache__/
 **/lib/
 **/graph.html
+static

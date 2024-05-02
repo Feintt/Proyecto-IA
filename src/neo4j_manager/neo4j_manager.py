@@ -18,17 +18,6 @@ class Neo4jManager:
             })
         return users
 
-    def generate_movies(self, n):
-        genres = ["Action", "Comedy", "Drama", "Science Fiction", "Documentary"]
-        movies = []
-        for _ in range(n):
-            movies.append({
-                "title": self.fake.sentence(nb_words=3),
-                "year": random.randint(1980, 2024),
-                "genre": random.choice(genres)
-            })
-        return movies
-
     def clear_database(self):
         self.graph.run("MATCH (n) DETACH DELETE n")
 
@@ -72,3 +61,10 @@ class Neo4jManager:
             return result[0]['name']
         else:
             return None  # Retorna None si no hay usuarios disponibles
+
+    def get_all_users(self):
+        query = """
+        MATCH (u:User)
+    RETURN u.name AS user_name
+        """
+        return self.graph.run(query).data()
