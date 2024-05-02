@@ -1,8 +1,10 @@
 from seed import seed
+from neo4j_manager import Neo4jManager
 
 
 def main():
-    seed()
+    manager = Neo4jManager()
+    seed(manager)
 
 
 if __name__ == "__main__":
