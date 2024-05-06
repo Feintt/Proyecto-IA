@@ -1,11 +1,15 @@
 from faker import Faker
 import random
 from py2neo import Graph
+import os
 
 
 class Neo4jManager:
     def __init__(self):
-        self.graph = Graph("bolt://localhost:7687", auth=("neo4j", "password"))
+        _username = os.getenv("NEO4J_USER")
+        _password = os.getenv("NEO4J_PASS")
+        _host = os.getenv("NEO4J_HOST")
+        self.graph = Graph(f"bolt://{_host}:7687", auth=(_username, _password))
         self.fake = Faker()
 
     def generate_users(self, n):
