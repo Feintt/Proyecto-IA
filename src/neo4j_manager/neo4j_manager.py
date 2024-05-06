@@ -64,7 +64,39 @@ class Neo4jManager:
 
     def get_all_users(self):
         query = """
-        MATCH (u:User)
-    RETURN u.name AS user_name
+         MATCH (u:User)
+        RETURN u.name AS user_name
+        ORDER BY u.name
         """
         return self.graph.run(query).data()
+
+    def get_movies_by_user(self, user_name):
+        query = """
+        MATCH (u:User {name: $user_name})-[:SAW]->(m:Movie)
+        RETURN m.title AS movie_title
+        """
+        return self.graph.run(query, user_name=user_name).data()
+
+    def get_liked_movies_by_user(self, user_name):
+        query = """
+        MATCH (u:User {name: $user_name})-[:LIKED]->(m:Movie)
+        RETURN m.title AS movie_title
+        """
+        return self.graph.run(query, user_name=user_name).data()
+
+    def get_users_by_movie(self, movie_title):
+        query = """
+        MATCH (u:User)-[:SAW]->(m:Movie {title: $movie_title})
+        OPTIONAL MATCH (u)-[:LIKED]->(m:Movie {title: $movie_title})
+        RETURN u.name AS user_name
+        """
+        return self.graph.run(query, movie_title=movie_title).data()
+
+    def get_users_by_movies(self, movie_titles):
+        query = """
+        MATCH (u:User)-[:SAW]->(m:Movie)
+        WHERE m.title IN $movie_titles
+        OPTIONAL MATCH (u)-[:LIKED]->(m)
+        RETURN u.name AS user_name, m.title AS movie_title
+        """
+        return self.graph.run(query, movie_titles=movie_titles).data()

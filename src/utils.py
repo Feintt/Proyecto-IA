@@ -15,6 +15,8 @@ def render_html_graph(path):
 
 def create_vis(data, user_names, selected_user=None):
     nt = Network("800px", "1000px")
+    options = '{"configure": {"enabled": false}, "edges": {"color": {"inherit": true}, "smooth": {"enabled": true, "type": "dynamic"}}, "interaction": {"dragNodes": true, "hideEdgesOnDrag": false, "hideNodesOnDrag": false}, "physics": {"enabled": false, "stabilization": {"enabled": true, "fit": true, "iterations": 1000, "onlyDynamicEdges": false, "updateInterval": 50}}}'
+    nt.set_options(options)  # Desactivar las físicas
     for record in data:
         n_name = record['n_name']
         m_name = record['m_name']
@@ -41,14 +43,65 @@ def create_vis(data, user_names, selected_user=None):
     return path
 
 
-def fetch_graph_data(manager: Neo4jManager):
-    # Consulta para obtener solo los nodos y relaciones más relevantes
-    query = """
-    MATCH (n)-[r]->(m)
-    WHERE n.name IS NOT NULL AND m.name IS NOT NULL
-    RETURN n.name AS n_name, m.name AS m_name, type(r) AS relationship_type
-    LIMIT 100
-    """
+def visualize_recommendations(manager, selected_user, recommendations):
+    # Crear una instancia de un gráfico de Pyvis
+    nt = Network("800px", "800px")
+    options = '{"configure": {"enabled": false}, "edges": {"color": {"inherit": true}, "smooth": {"enabled": true, "type": "dynamic"}}, "interaction": {"dragNodes": true, "hideEdgesOnDrag": false, "hideNodesOnDrag": false}, "physics": {"enabled": false, "stabilization": {"enabled": true, "fit": true, "iterations": 1000, "onlyDynamicEdges": false, "updateInterval": 50}}}'
+    nt.set_options(options)
+
+    # Añadir nodo para el usuario seleccionado
+    nt.add_node(selected_user, title=selected_user, label=selected_user, color="green")
+
+    # Añadir nodos para cada película recomendada y enlaces hacia el usuario seleccionado
+    for movie in recommendations:
+        nt.add_node(movie, title=movie, label=movie, color="blue")
+        nt.add_edge(selected_user, movie, title="Recomendada", color="orange")
+
+    # Guardar y mostrar el gráfico
+    path = "static/recommendations_graph.html"
+    nt.save_graph(path)
+    return path
+
+
+def visualize_greedy_traversal(manager, user_name):
+    nt = Network("800px", "800px", notebook=False)
+    seen_movies = set(movie['movie_title'] for movie in manager.get_movies_by_user(user_name))
+    liked_movies = set(movie['movie_title'] for movie in manager.get_liked_movies_by_user(user_name))
+
+    # Add primary user node
+    nt.add_node(user_name, color="red", title="Primary User")
+
+    # Fetch related users and movies
+    related_users = set()
+    movie_details = {}
+
+    for movie in seen_movies | liked_movies:
+        users = manager.get_users_by_movie(movie)
+        for user in users:
+            if user['user_name'] != user_name:
+                related_users.add(user['user_name'])
+                movie_details.setdefault(movie, []).append(user['user_name'])
+                nt.add_node(movie, color="blue", title=movie)
+                nt.add_edge(user_name, movie, color="orange")
+
+    for movie, users in movie_details.items():
+        for user in users:
+            nt.add_node(user, color="green", title=user)
+            nt.add_edge(user, movie, color="grey")
+
+    path = "static/greedy_traversal.html"
+    nt.save_graph(path)
+    return path
+
+
+def fetch_graph_data(manager: Neo4jManager, user_limit=100, movie_limit=100, limit=100):
+    # Consulta para obtener una cantidad limitada de usuarios y películas
+    query = f"""
+        MATCH (u:User)-[r:SAW|LIKED]->(m:Movie)
+        RETURN u.name AS n_name, m.name AS m_name, type(r) AS relationship_type
+        ORDER BY u.name, m.name, type(r)
+        LIMIT {limit}
+    """.format(limit=user_limit + movie_limit)
     try:
         data = manager.run_query(query)
         if not data:
