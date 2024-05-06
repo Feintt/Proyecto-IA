@@ -1,6 +1,6 @@
 faker==25.0.0
 py2neo==2021.2.4
-streamlit
-networkx
-pyvis
-matplotlib
+streamlit==1.33.0
+networkx==3.3
+pyvis==0.3.2
+matplotlib==3.8.4

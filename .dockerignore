@@ -1,0 +1,9 @@
+docker-compose.yml
+Dockerfile
+.venv
+neo4j
+.idea
+.gitignore
+.dockerignore
+src/lib
+src/static
