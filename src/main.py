@@ -5,7 +5,7 @@ from datetime import timedelta
 
 def main():
     st.title("Multi-page Streamlit App")
-    menu = ["Movies", "Scheduler", "Contact"]
+    menu = ["Movies", "Scheduler"]
     choice = st.sidebar.selectbox("Navigation", menu)
     if choice == "Movies":
         st.subheader("Movies Page")
@@ -106,11 +106,6 @@ def main():
             st.write("Mejor horario encontrado:")
             for class_name, (day, start_time, end_time) in class_schedule.items():
                 st.write(f"{class_name}: {day} {start_time}-{end_time}")
-
-
-    elif choice == "Contact":
-        st.subheader("Contact Page")
-    # Streamlit app title
 
 
 if __name__ == "__main__":

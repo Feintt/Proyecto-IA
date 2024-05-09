@@ -106,31 +106,33 @@ def fetch_graph_data(manager: Neo4jManager, user_limit=100, movie_limit=100, lim
         print(f"Error fetching graph data: {e}")
         return []
 
-clases = {
-            'Matemáticas': ['Lunes 8:00-10:00', 'Miércoles 10:00-12:00'],
-            'Historia': ['Lunes 10:00-12:00', 'Jueves 8:00-10:00'],
-            'Ciencias': ['Martes 8:00-10:00', 'Viernes 10:00-12:00'],
-            'Literatura': ['Martes 10:00-12:00', 'Miércoles 8:00-10:00'],
-            'Física': ['Miércoles 14:00-16:00', 'Viernes 8:00-10:00'],
-            'Química': ['Jueves 10:00-12:00', 'Viernes 14:00-16:00']
-        }
 
-         #Definición de las restricciones de disponibilidad de los profesores
+clases = {
+    'Matemáticas': ['Lunes 8:00-10:00', 'Miércoles 10:00-12:00'],
+    'Historia': ['Lunes 10:00-12:00', 'Jueves 8:00-10:00'],
+    'Ciencias': ['Martes 8:00-10:00', 'Viernes 10:00-12:00'],
+    'Literatura': ['Martes 10:00-12:00', 'Miércoles 8:00-10:00'],
+    'Física': ['Miércoles 14:00-16:00', 'Viernes 8:00-10:00'],
+    'Química': ['Jueves 10:00-12:00', 'Viernes 14:00-16:00']
+}
+
+# Definición de las restricciones de disponibilidad de los profesores
 disponibilidad_profesores = {
-            'Profesor1': ['Lunes 8:00-12:00', 'Martes 8:00-12:00', 'Miércoles 8:00-12:00'],
-            'Profesor2': ['Lunes 10:00-14:00', 'Martes 10:00-14:00', 'Miércoles 10:00-14:00'],
-            'Profesor3': ['Martes 14:00-18:00', 'Jueves 14:00-18:00', 'Viernes 14:00-18:00'],
-            'Profesor4': ['Lunes 14:00-18:00', 'Miércoles 14:00-18:00', 'Viernes 10:00-14:00'],
-            'Profesor5': ['Lunes 8:00-12:00', 'Miércoles 8:00-12:00', 'Viernes 8:00-12:00'],
-        }
+    'Profesor1': ['Lunes 8:00-12:00', 'Martes 8:00-12:00', 'Miércoles 8:00-12:00'],
+    'Profesor2': ['Lunes 10:00-14:00', 'Martes 10:00-14:00', 'Miércoles 10:00-14:00'],
+    'Profesor3': ['Martes 14:00-18:00', 'Jueves 14:00-18:00', 'Viernes 14:00-18:00'],
+    'Profesor4': ['Lunes 14:00-18:00', 'Miércoles 14:00-18:00', 'Viernes 10:00-14:00'],
+    'Profesor5': ['Lunes 8:00-12:00', 'Miércoles 8:00-12:00', 'Viernes 8:00-12:00'],
+}
 tiempo_clases = {
-            "Matemáticas": "2 horas",
-            "Historia": "2 horas",
-            "Ciencias": "2 horas",
-            "Literatura": "2 horas",
-            "Física": "2 horas",
-            "Química": "2 horas",
-        }
+    "Matemáticas": "2 horas",
+    "Historia": "2 horas",
+    "Ciencias": "2 horas",
+    "Literatura": "2 horas",
+    "Física": "2 horas",
+    "Química": "2 horas",
+}
+
 
 def generar_horario_inicial():
     horario = {}
@@ -138,16 +140,20 @@ def generar_horario_inicial():
         horario[clase] = random.choice(clases[clase])
     return horario
 
-        # Función para evaluar la calidad de un horario
+    # Función para evaluar la calidad de un horario
+
+
 def evaluar_horario(horario):
-            # Por simplicidad, evaluamos simplemente la disponibilidad de los profesores
+    # Por simplicidad, evaluamos simplemente la disponibilidad de los profesores
     for clase, horario_clase in horario.items():
         for profesor, horarios_disponibles in disponibilidad_profesores.items():
-             if horario_clase not in horarios_disponibles:
+            if horario_clase not in horarios_disponibles:
                 return False
     return True
 
-        # Función de hill climbing para mejorar el horario
+    # Función de hill climbing para mejorar el horario
+
+
 def hill_climbing():
     horario_actual = generar_horario_inicial()
     mejor_horario = horario_actual.copy()
@@ -168,7 +174,9 @@ def hill_climbing():
 
     return mejor_horario
 
-        # Clase para asignar horarios de clases
+    # Clase para asignar horarios de clases
+
+
 class ClassScheduler:
     def __init__(self, schedule, classes):
         self.schedule = schedule
@@ -228,39 +236,33 @@ class ClassScheduler:
 
         return class_schedule
 
+
 def visualize_graph_snapshots(graphs):
     tmp_dir = 'tmp'
     os.makedirs(tmp_dir, exist_ok=True)  # Ensure the directory exists
 
-    # clear the tmp directory
+    # Clear the tmp directory of old files
     for file in os.listdir(tmp_dir):
         os.remove(os.path.join(tmp_dir, file))
 
     for i, graph in enumerate(graphs):
         file_path = os.path.join(tmp_dir, f"graph_{i}.html")
-        if True:
-            nt = Network(height="750px", bgcolor="#222222", font_color="white")
-            nt.barnes_hut()  # Set the physics layout of the network
+        # Create the network visualizations
+        nt = Network(height="750px", width="100%", bgcolor="#222222", font_color="white")
+        nt.barnes_hut()  # Set the physics layout of the network
 
-            # Iterate over all nodes and edges in the NetworkX graph
-            for node, ndata in graph.nodes(data=True):
-                nt.add_node(node, title=node, label=node, color=ndata.get('color', 'blue'))
+        # Add nodes and edges
+        for node, ndata in graph.nodes(data=True):
+            nt.add_node(node, title=node, label=node, color=ndata.get('color', 'blue'))
+        for source, target, edata in graph.edges(data=True):
+            weight = edata.get('weight', 1)
+            nt.add_edge(source, target, value=weight)
 
-            for source, target, edata in graph.edges(data=True):
-                weight = edata.get('weight', 1)
-                nt.add_edge(source, target, value=weight)
+        # Show physics control buttons
+        nt.show_buttons(filter_=['physics'])
 
-            # Add neighbor data to node hover data
-            neighbor_map = nt.get_adj_list()
-            for node in nt.nodes:
-                node["title"] += " Neighbors:<br>" + "<br>".join(neighbor_map[node["id"]])
-                node["value"] = len(neighbor_map[node["id"]])
-
-            # Show physics control buttons in the network visualization
-            nt.show_buttons(filter_=['physics'])
-
-            # Save the network to an HTML file
-            nt.save_graph(file_path)
+        # Save the network to an HTML file
+        nt.save_graph(file_path)
 
     # Display logic using Streamlit with navigation
     if 'current_graph_index' not in st.session_state:
@@ -280,4 +282,4 @@ def visualize_graph_snapshots(graphs):
     file_path = os.path.join(tmp_dir, f"graph_{current_index}.html")
     with open(file_path) as file:
         html_content = file.read()
-    components.html(html_content, height=800)
+    components.html(html_content, height=800, scrolling=True)  # Enable scrolling within the iframe
