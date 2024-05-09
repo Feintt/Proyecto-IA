@@ -2,7 +2,6 @@ from utils import *
 from search_algorithms import *
 import streamlit.components.v1 as components
 from pyvis.network import Network
-import networkx as nx
 import os
 from seed import seed
 from datetime import datetime, timedelta
@@ -136,10 +135,14 @@ def visualize_graph_snapshots(graphs):
     tmp_dir = 'tmp'
     os.makedirs(tmp_dir, exist_ok=True)  # Ensure the directory exists
 
+    # clear the tmp directory
+    for file in os.listdir(tmp_dir):
+        os.remove(os.path.join(tmp_dir, file))
+
     for i, graph in enumerate(graphs):
         file_path = os.path.join(tmp_dir, f"graph_{i}.html")
-        if True:  # Only create if it doesn't already exist
-            nt = Network(height="750px", width="100%", bgcolor="#222222", font_color="white")
+        if True:
+            nt = Network(height="750px", bgcolor="#222222", font_color="white")
             nt.barnes_hut()  # Set the physics layout of the network
 
             # Iterate over all nodes and edges in the NetworkX graph

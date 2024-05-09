@@ -13,9 +13,11 @@ def beam_search_recommendations(manager, user_name, beam_width=5):
     current_recommendations = set()
     graphs = []  # Store NetworkX graphs for each layer
 
-    G = nx.Graph()  # Initialize NetworkX Graph
+    # Initialize NetworkX Graph
+    G = nx.Graph()
     for movie in initial_movies:
         G.add_node(movie, label=movie, color='blue')
+    graphs.append(G.copy())  # Store initial state of the graph
 
     for i in range(3):  # Example depth of 3 layers
         new_layer = defaultdict(int)
@@ -23,7 +25,8 @@ def beam_search_recommendations(manager, user_name, beam_width=5):
 
         for movie in layers[-1]:
             # Node style for current layer
-            if i > 0: G.add_node(movie, label=movie, color='red')
+            if i > 0:
+                G.add_node(movie, label=movie, color='red')  # This might be redundant if G already contains these nodes
 
             for user in manager.get_users_by_movie(movie):
                 if user['user_name'] != user_name:
@@ -47,7 +50,7 @@ def beam_search_recommendations(manager, user_name, beam_width=5):
 
         # Combine layer graph with main graph
         G = nx.compose(G, layer_graph)
-        graphs.append(G.copy())  # Store snapshot
+        graphs.append(G.copy())  # Store snapshot after each layer is processed
 
     return list(current_recommendations), graphs
 
