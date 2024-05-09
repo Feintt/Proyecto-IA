@@ -1,12 +1,7 @@
 from utils import *
 from search_algorithms import *
-import streamlit.components.v1 as components
-from pyvis.network import Network
-import os
-from seed import seed
-from datetime import datetime, timedelta
-import random
-import heapq
+from datetime import timedelta
+
 
 def main():
     st.title("Multi-page Streamlit App")
@@ -68,7 +63,7 @@ def main():
 
     elif choice == "Scheduler":
         st.subheader("Scheduler")
-         # Definir la interfaz de usuario con Streamlit
+        # Definir la interfaz de usuario con Streamlit
         st.title("Generador de Horarios Escolares")
         st.write("Diccionario de Clases:")
         for clase, horarios_clase in clases.items():
@@ -116,7 +111,6 @@ def main():
     elif choice == "Contact":
         st.subheader("Contact Page")
     # Streamlit app title
-
 
 
 if __name__ == "__main__":
