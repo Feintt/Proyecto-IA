@@ -140,9 +140,9 @@ def main():
     st.write("Haz clic en el botón para generar un horario escolar aleatorio.")
     if st.button("Generar Horario Aleatorio"):
         mejor_horario = hill_climbing()
-        st.write("Mejor horario encontrado:")
-        for clase, horario in mejor_horario.items():
-            st.write(f"{clase}: {horario}")
+    st.write("Mejor horario encontrado:")
+    for clase, horario in mejor_horario.items():
+        st.write(f"{clase}: {horario}")
 
     st.header("Asignador de Horario de Clases")
     st.write("Haz clic en el botón para asignar horarios de clases.")
