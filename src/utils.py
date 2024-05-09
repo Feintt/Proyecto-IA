@@ -3,6 +3,22 @@ import streamlit as st
 from pyvis.network import Network
 from neo4j_manager import Neo4jManager
 import streamlit
+import time
+
+
+def time_tracker(func):
+    """A decorator that displays the execution time of the function it wraps in Streamlit."""
+
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)  # Execute the wrapped function
+        end_time = time.time()
+        execution_time = end_time - start_time
+        st.write(
+            f"Execution time of {func.__name__}: {execution_time:.4f} seconds")  # Use Streamlit to display the execution time
+        return result
+
+    return wrapper
 
 
 def render_html_graph(path):

@@ -91,14 +91,12 @@ def main():
 
     # Visualization tabs
     tab1, tab2, tab3 = st.tabs(["General Graph", "Recommendations", "Algorithm Visualization"])
-    create_vis(data, user_names, selected_user)
 
     with tab1:
         path = create_vis(data, user_names, selected_user)
         render_html_graph(path)  # Assuming this function embeds the HTML in Streamlit
 
     with tab2:
-        # Display recommendations based on the selected algorithm
         if algorithm == "Beam Search":
             recommendations, graphs = beam_search_recommendations(manager, selected_user, 5)
         elif algorithm == "Greedy Best-First Search":

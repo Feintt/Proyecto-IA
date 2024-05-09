@@ -1,8 +1,10 @@
 from neo4j_manager import Neo4jManager
 from collections import defaultdict, deque
 import networkx as nx
+from utils import time_tracker
 
 
+@time_tracker
 def beam_search_recommendations(manager, user_name, beam_width=5):
     seen_movies = set(movie['movie_title'] for movie in manager.get_movies_by_user(user_name))
     liked_movies = set(movie['movie_title'] for movie in manager.get_liked_movies_by_user(user_name))
@@ -50,6 +52,7 @@ def beam_search_recommendations(manager, user_name, beam_width=5):
     return list(current_recommendations), graphs
 
 
+@time_tracker
 def hill_climbing_recommendations(manager: Neo4jManager, user_name, iterations=10):
     seen_movies = set(movie['movie_title'] for movie in manager.get_movies_by_user(user_name))
     liked_movies = set(movie['movie_title'] for movie in manager.get_liked_movies_by_user(user_name))
@@ -88,6 +91,7 @@ def hill_climbing_recommendations(manager: Neo4jManager, user_name, iterations=1
     return list(current_recommendations), graphs
 
 
+@time_tracker
 def greedy_best_first_search_recommendations(manager: Neo4jManager, user_name, top_k=5):
     seen_movies = set(movie['movie_title'] for movie in manager.get_movies_by_user(user_name))
     liked_movies = set(movie['movie_title'] for movie in manager.get_liked_movies_by_user(user_name))
@@ -122,4 +126,3 @@ def greedy_best_first_search_recommendations(manager: Neo4jManager, user_name, t
 
     recommended_movies = sorted(movie_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
     return [movie for movie, _ in recommended_movies], graphs
-
