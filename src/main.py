@@ -1,5 +1,6 @@
 from utils import *
 from search_algorithms import *
+import streamlit.components.v1 as components
 
 
 def main():
@@ -30,18 +31,26 @@ def main():
     # Fetch graph data
     data = fetch_graph_data(manager, user_limit, movies_limit, limit)
 
+    # show the data
+    st.write(data)
+
     # Create and render the graph
     path = create_vis(data, user_names, selected_user)
     render_html_graph(path)
 
-    # Display recommendations
-    recommendations = greedy_recommendations(manager, selected_user)[:5]
-
+    # Display beam search recommendations
+    recommendations = beam_search_recommendations(manager, selected_user, 5)
     path = visualize_recommendations(manager, selected_user, recommendations)
     render_html_graph(path)
 
-    # Display greedy traversal
-    path = visualize_greedy_traversal(manager, selected_user)
+    # Display the hill climbing recommendations
+    recommendations = hill_climbing_recommendations(manager, selected_user, 5)
+    path = visualize_recommendations(manager, selected_user, recommendations)
+    render_html_graph(path)
+
+    # Display the greedy best first search recommendations
+    recommendations = greedy_best_first_search_recommendations(manager, selected_user, 5)
+    path = visualize_recommendations(manager, selected_user, recommendations)
     render_html_graph(path)
 
 
