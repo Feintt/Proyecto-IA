@@ -166,36 +166,66 @@ def hill_climbing_recommendations(manager: Neo4jManager, user_name, iterations=1
 
 @time_tracker
 def greedy_best_first_search_recommendations(manager: Neo4jManager, user_name, top_k=5):
+    # Retrieve all the movies that the target user has watched.
     seen_movies = set(movie['movie_title'] for movie in manager.get_movies_by_user(user_name))
-    liked_movies = set(movie['movie_title'] for movie in manager.get_liked_movies_by_user(user_name))
-    explore_queue = deque(seen_movies | liked_movies)
-    explored_movies = set()
-    movie_scores = defaultdict(int)
-    graphs = []  # To store the graph at each step
 
+    # Retrieve all the movies that the target user has explicitly liked.
+    liked_movies = set(movie['movie_title'] for movie in manager.get_liked_movies_by_user(user_name))
+
+    # Initialize the queue with all movies that the target user has seen or liked.
+    explore_queue = deque(seen_movies | liked_movies)
+
+    # A set to keep track of movies that have already been explored.
+    explored_movies = set()
+
+    # A defaultdict to store scores for each movie recommendation.
+    movie_scores = defaultdict(int)
+
+    # List to store graph states for visualization purposes.
+    graphs = []
+
+    # Create a NetworkX graph and add initial nodes (movies in the explore queue).
     G = nx.Graph()
     G.add_nodes_from(explore_queue)
 
+    # Keep processing until the explore queue is empty or the required top_k recommendations are found.
     while explore_queue and len(movie_scores) < top_k:
+        # Pop the first movie from the queue to explore it.
         current_movie = explore_queue.popleft()
+
+        # Add this movie to the explored set.
         explored_movies.add(current_movie)
+
+        # Create a copy of the current graph for visualization at this stage.
         current_graph = G.copy()
 
+        # Retrieve all users who have seen this current movie.
         related_users = manager.get_users_by_movie(current_movie)
+
+        # For each user, collect movies that they have also seen or liked.
         for user in related_users:
+            # Ignore the target user themselves.
             if user['user_name'] != user_name:
                 other_movies = set(m['movie_title'] for m in manager.get_movies_by_user(user['user_name']))
                 other_movies |= set(m['movie_title'] for m in manager.get_liked_movies_by_user(user['user_name']))
 
+                # Explore only movies that haven't been seen, liked, or already explored by the target user.
                 for movie in other_movies:
                     if movie not in seen_movies and movie not in liked_movies and movie not in explored_movies:
+                        # If this new movie hasn't been added to the exploration queue, add it now.
                         if movie not in explore_queue:
                             explore_queue.append(movie)
+
+                        # Increment the score for this movie.
                         movie_scores[movie] += 1
+
+                        # Add an edge between the current movie and the new recommendation.
                         current_graph.add_node(movie, label=movie)
                         current_graph.add_edge(current_movie, movie)
 
+        # Append the current graph state to the list of graphs for visualization.
         graphs.append(current_graph)
 
+    # Sort the movies based on their scores and return the top_k recommendations and graphs.
     recommended_movies = sorted(movie_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
     return [movie for movie, _ in recommended_movies], graphs
