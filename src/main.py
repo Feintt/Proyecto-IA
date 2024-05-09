@@ -91,6 +91,7 @@ def main():
 
     # Visualization tabs
     tab1, tab2, tab3 = st.tabs(["General Graph", "Recommendations", "Algorithm Visualization"])
+    create_vis(data, user_names, selected_user)
 
     with tab1:
         path = create_vis(data, user_names, selected_user)
