@@ -35,6 +35,10 @@ def render_html_graph(path):
 
 
 def create_vis(data, user_names, selected_user=None):
+    # Create static directory of it does not exist
+    if not os.path.exists("static"):
+        os.makedirs("static")
+
     nt = Network("800px", "1000px")
     options = ('{"configure": {"enabled": false}, "edges": {"color": {"inherit": true}, "smooth": {"enabled": true, '
                '"type": "dynamic"}}, "interaction": {"dragNodes": true, "hideEdgesOnDrag": false, "hideNodesOnDrag": '
