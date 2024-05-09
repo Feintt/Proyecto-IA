@@ -2,6 +2,7 @@ import os
 import streamlit as st
 from pyvis.network import Network
 from neo4j_manager import Neo4jManager
+import streamlit
 
 
 def render_html_graph(path):
@@ -57,6 +58,7 @@ def visualize_recommendations(manager, selected_user, recommendations):
 
     # Añadir nodos para cada película recomendada y enlaces hacia el usuario seleccionado
     for movie in recommendations:
+        streamlit.write(movie)
         nt.add_node(movie, title=movie, label=movie, color="blue")
         nt.add_edge(selected_user, movie, title="Recomendada", color="orange")
 
