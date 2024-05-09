@@ -19,7 +19,7 @@ def time_tracker(func):
         end_time = time.time()
         execution_time = end_time - start_time
         st.write(
-            f"Execution time of {func.__name__}: {execution_time:.4f} seconds")  # Use Streamlit to display the execution time
+            f"Execution time of {func.__name__}: {execution_time:.4f} seconds")
         return result
 
     return wrapper
@@ -71,7 +71,7 @@ def create_vis(data, user_names, selected_user=None):
     return path
 
 
-def visualize_recommendations(manager, selected_user, recommendations):
+def visualize_recommendations(_manager, selected_user, recommendations):
     # Crear una instancia de un gráfico de Pyvis
     nt = Network("800px", "800px")
     options = '{"configure": {"enabled": false}, "edges": {"color": {"inherit": true}, "smooth": {"enabled": true, "type": "dynamic"}}, "interaction": {"dragNodes": true, "hideEdgesOnDrag": false, "hideNodesOnDrag": false}, "physics": {"enabled": false, "stabilization": {"enabled": true, "fit": true, "iterations": 1000, "onlyDynamicEdges": false, "updateInterval": 50}}}'
@@ -181,22 +181,24 @@ def hill_climbing():
     # Clase para asignar horarios de clases
 
 
+def calculate_remaining_time(current_time, event_time):
+    if current_time < event_time:
+        return event_time - current_time
+    else:
+        return timedelta(days=1) - (current_time - event_time)
+
+
+def heuristic(_current_time, remaining_classes):
+    # Simple heuristic: estimated time to schedule remaining classes
+    return sum([class_duration.total_seconds() for class_duration in remaining_classes])
+
+
 class ClassScheduler:
     def __init__(self, schedule, classes):
         self.schedule = schedule
         self.classes = classes
         self.start_time = datetime.strptime("00:00", "%H:%M")
         self.visited_slots = set()  # Conjunto para mantener los nodos visitados
-
-    def calculate_remaining_time(self, current_time, event_time):
-        if current_time < event_time:
-            return event_time - current_time
-        else:
-            return timedelta(days=1) - (current_time - event_time)
-
-    def heuristic(self, current_time, remaining_classes):
-        # Simple heuristic: estimated time to schedule remaining classes
-        return sum([class_duration.total_seconds() for class_duration in remaining_classes])
 
     def find_earliest_available_slot(self, current_time):
         earliest_slot = None
@@ -208,7 +210,7 @@ class ClassScheduler:
                 if slot not in self.visited_slots:
                     start = datetime.strptime(start_time, "%H:%M")
                     if start >= current_time:
-                        remaining_time = self.calculate_remaining_time(current_time, start)
+                        remaining_time = calculate_remaining_time(current_time, start)
                         if remaining_time < min_remaining_time:
                             earliest_slot = (day, start_time)
                             min_remaining_time = remaining_time
@@ -216,12 +218,11 @@ class ClassScheduler:
         return earliest_slot
 
     def assign_class_schedule(self):
-        current_time = self.start_time
         remaining_classes = [(duration, class_name) for class_name, duration in self.classes.items()]
         heapq.heapify(remaining_classes)
         class_schedule = {}
 
-        for day in self.schedule:  # Iterar sobre todos los días disponibles
+        for _day in self.schedule:  # Iterar sobre todos los días disponibles
             current_time = self.start_time  # Reiniciar el tiempo al principio del día
             while remaining_classes:
                 current_slot = self.find_earliest_available_slot(current_time)
@@ -252,7 +253,7 @@ def visualize_graph_snapshots(graphs):
     for i, graph in enumerate(graphs):
         file_path = os.path.join(tmp_dir, f"graph_{i}.html")
         # Create the network visualizations
-        nt = Network(height="750px", width="100%", bgcolor="#222222", font_color="white")
+        nt = Network(height="750px", bgcolor="#222222", font_color="white")
         nt.barnes_hut()  # Set the physics layout of the network
 
         # Add nodes and edges
