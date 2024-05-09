@@ -21,6 +21,14 @@ disponibilidad_profesores = {
     'Profesor4': ['Lunes 14:00-18:00', 'Miércoles 14:00-18:00', 'Viernes 10:00-14:00'],
     'Profesor5': ['Lunes 8:00-12:00', 'Miércoles 8:00-12:00', 'Viernes 8:00-12:00'],
 }
+tiempo_clases={
+            "Matemáticas": "2 horas",
+            "Historia": "2 horas",
+            "Ciencias": "2 horas",
+            "Literatura": "2 horas",
+            "Física": "2 horas",
+            "Química": "2 horas",
+        }
 
 # Función para generar un horario inicial aleatorio
 def generar_horario_inicial():
@@ -122,7 +130,12 @@ class ClassScheduler:
 # Definir la interfaz de usuario con Streamlit
 def main():
     st.title("Generador de Horarios Escolares")
-
+    st.write("Diccionario de Clases:")
+    for clase, horarios_clase in clases.items():
+        st.write(f"- {clase}: {', '.join(horarios_clase)}")
+    st.write("tiempo de clases:")
+    for clase, tiempo_clase in tiempo_clases.items():
+        st.write(f"- {clase}: {tiempo_clase}")
     st.header("Generador de Horario Aleatorio")
     st.write("Haz clic en el botón para generar un horario escolar aleatorio.")
     if st.button("Generar Horario Aleatorio"):
@@ -136,11 +149,11 @@ def main():
     if st.button("Asignar Horario de Clases"):
         # Ejemplo de horarios
         schedule = {
-            "Monday": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
-            "Tuesday": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
-            "Wednesday": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
-            "Thursday": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
-            "Friday": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
+            "Lunes": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
+            "Martes": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
+            "Miercoles": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
+            "Jueves": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
+            "Viernes": [("08:00", "10:00"), ("10:00", "12:00"), ("14:00", "16:00")],
         }
 
         # Diccionario de clases con duraciones
