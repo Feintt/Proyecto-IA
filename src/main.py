@@ -3,6 +3,7 @@ from search_algorithms import *
 from datetime import timedelta
 
 
+
 def main():
     # Display the main title of the app.
     st.title("Multi-page Streamlit App")
