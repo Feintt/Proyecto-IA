@@ -2,6 +2,7 @@ import os
 import streamlit as st
 from pyvis.network import Network
 from neo4j_manager import Neo4jManager
+import streamlit
 
 
 def render_html_graph(path):
@@ -15,7 +16,10 @@ def render_html_graph(path):
 
 def create_vis(data, user_names, selected_user=None):
     nt = Network("800px", "1000px")
-    options = '{"configure": {"enabled": false}, "edges": {"color": {"inherit": true}, "smooth": {"enabled": true, "type": "dynamic"}}, "interaction": {"dragNodes": true, "hideEdgesOnDrag": false, "hideNodesOnDrag": false}, "physics": {"enabled": false, "stabilization": {"enabled": true, "fit": true, "iterations": 1000, "onlyDynamicEdges": false, "updateInterval": 50}}}'
+    options = ('{"configure": {"enabled": false}, "edges": {"color": {"inherit": true}, "smooth": {"enabled": true, '
+               '"type": "dynamic"}}, "interaction": {"dragNodes": true, "hideEdgesOnDrag": false, "hideNodesOnDrag": '
+               'false}, "physics": {"enabled": false, "stabilization": {"enabled": true, "fit": true, "iterations": '
+               '1000, "onlyDynamicEdges": false, "updateInterval": 50}}}')
     nt.set_options(options)  # Desactivar las físicas
     for record in data:
         n_name = record['n_name']
@@ -54,42 +58,12 @@ def visualize_recommendations(manager, selected_user, recommendations):
 
     # Añadir nodos para cada película recomendada y enlaces hacia el usuario seleccionado
     for movie in recommendations:
+        streamlit.write(movie)
         nt.add_node(movie, title=movie, label=movie, color="blue")
         nt.add_edge(selected_user, movie, title="Recomendada", color="orange")
 
     # Guardar y mostrar el gráfico
     path = "static/recommendations_graph.html"
-    nt.save_graph(path)
-    return path
-
-
-def visualize_greedy_traversal(manager, user_name):
-    nt = Network("800px", "800px", notebook=False)
-    seen_movies = set(movie['movie_title'] for movie in manager.get_movies_by_user(user_name))
-    liked_movies = set(movie['movie_title'] for movie in manager.get_liked_movies_by_user(user_name))
-
-    # Add primary user node
-    nt.add_node(user_name, color="red", title="Primary User")
-
-    # Fetch related users and movies
-    related_users = set()
-    movie_details = {}
-
-    for movie in seen_movies | liked_movies:
-        users = manager.get_users_by_movie(movie)
-        for user in users:
-            if user['user_name'] != user_name:
-                related_users.add(user['user_name'])
-                movie_details.setdefault(movie, []).append(user['user_name'])
-                nt.add_node(movie, color="blue", title=movie)
-                nt.add_edge(user_name, movie, color="orange")
-
-    for movie, users in movie_details.items():
-        for user in users:
-            nt.add_node(user, color="green", title=user)
-            nt.add_edge(user, movie, color="grey")
-
-    path = "static/greedy_traversal.html"
     nt.save_graph(path)
     return path
 
